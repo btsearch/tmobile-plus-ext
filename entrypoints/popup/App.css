@@ -1,0 +1,153 @@
+#root {
+  min-height: 100%;
+}
+
+main {
+  padding: 22px;
+}
+
+header {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.brand-mark {
+  align-items: center;
+  background: #e20074;
+  border-radius: 9px;
+  color: white;
+  display: flex;
+  font-size: 19px;
+  font-weight: 850;
+  height: 38px;
+  justify-content: center;
+  letter-spacing: -0.08em;
+  width: 38px;
+}
+
+.eyebrow {
+  color: #8a6e7d;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+  margin: 0 0 2px;
+}
+
+h1 {
+  color: #251820;
+  font-size: 19px;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  margin: 0;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.toggle-row {
+  align-items: center;
+  background: #fff5fa;
+  border: 1px solid #f0d0e0;
+  border-radius: 11px;
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.toggle-row span,
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toggle-row strong,
+.field label {
+  color: #34242e;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+small {
+  color: #806b77;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+input[type="checkbox"] {
+  accent-color: #e20074;
+  height: 18px;
+  width: 18px;
+}
+
+.field input {
+  background: #fff;
+  border: 1px solid #d9c9d2;
+  border-radius: 8px;
+  color: #251820;
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+  padding: 10px 11px;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.field input:focus {
+  border-color: #e20074;
+  box-shadow: 0 0 0 3px rgba(226, 0, 116, 0.12);
+}
+
+button {
+  background: #e20074;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  padding: 11px 14px;
+  transition:
+    background 140ms ease,
+    transform 140ms ease;
+}
+
+button:hover:not(:disabled) {
+  background: #c90067;
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #e20074;
+  outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.save-state {
+  color: #087643;
+  font-size: 10px;
+  font-weight: 700;
+  margin: -10px 0 0;
+  min-height: 14px;
+  opacity: 0;
+  text-align: center;
+}
+
+.save-state.visible {
+  opacity: 1;
+}

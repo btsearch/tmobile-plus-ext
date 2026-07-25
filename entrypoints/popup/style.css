@@ -1,0 +1,24 @@
+@import "@fontsource-variable/nunito-sans";
+@import "tailwindcss";
+
+:root {
+  color: #04080b;
+  background: #fafcfd;
+  font-family: "Nunito Sans Variable", "Nunito Sans", sans-serif;
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+html,
+body,
+#root {
+  min-width: 320px;
+  margin: 0;
+  background: #fafcfd;
+}
+
+button,
+input {
+  font: inherit;
+}
