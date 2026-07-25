@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { createLabelsSignature, formatBandDetails, formatOverallAzimuths, formatSectorCount, isLabelsUpdatePayload, isPicocell } from "../lib/label-display.ts";
+import {
+  createLabelsSignature,
+  formatBandDetails,
+  formatOverallAzimuths,
+  formatSectorCount,
+  isLabelsUpdatePayload,
+  isPicocell,
+} from "../lib/label-display.ts";
 import { DEFAULT_LABEL_DISPLAY_OPTIONS, type LabelsUpdatePayload } from "../lib/messages.ts";
 
 void test("formats per-band and overall azimuth modes", () => {

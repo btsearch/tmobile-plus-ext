@@ -151,20 +151,20 @@ const overlayStyles = `
     font-size: 10px;
   }
 
-.dss {
+  .dss {
     color: #e20074;
     font-size: 9px;
     font-weight: 800;
     letter-spacing: 0.06em;
-  margin-left: auto;
-}
+    margin-left: auto;
+  }
 
-.pico {
-  color: #806b77;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-}
+  .pico {
+    color: #806b77;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
 
   .status {
     border: 1px solid rgba(36, 24, 32, 0.22);
