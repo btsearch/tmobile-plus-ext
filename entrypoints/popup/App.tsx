@@ -224,7 +224,7 @@ function App() {
             <SettingSwitch
               id={showDSSSwitchId}
               title="DSS"
-              description="LTE 2100 / NR 2100"
+              description="Pokazuje czy dana stacja ma sygnalizację 5G"
               checked={displayOptions.showDSS}
               disabled={displayControlsDisabled}
               onToggle={() => {

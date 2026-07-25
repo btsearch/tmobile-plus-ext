@@ -424,7 +424,7 @@ function createLabelElement(label: StationLabel, options: LabelDisplayOptions): 
     const dss = document.createElement("span");
     dss.className = "dss";
     dss.textContent = "DSS";
-    dss.title = "DSS: LTE 2100 / NR 2100";
+    dss.title = "Stacja posiada sygnalizację 5G";
     summary.append(dss);
   }
 
