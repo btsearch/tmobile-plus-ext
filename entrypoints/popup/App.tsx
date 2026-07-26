@@ -224,7 +224,7 @@ function App() {
             <SettingSwitch
               id={showDSSSwitchId}
               title="DSS"
-              description="Pokazuje czy dana stacja ma sygnalizację 5G"
+              description="Prawdopodobnie pokazuje czy dana stacja ma sygnalizację 5G"
               checked={displayOptions.showDSS}
               disabled={displayControlsDisabled}
               onToggle={() => {
@@ -272,7 +272,7 @@ function App() {
             autoComplete="off"
           />
           <small className="mt-1.5 block text-[10px] leading-4 text-[#636a6d]" id={apiKeyHelpId}>
-            Zapis lokalny. Puste pole wyłącza weryfikację BTSearch.
+            Puste pole wyłączy funkcje sprawdzania czy stacja istnieje w BTSearch.
           </small>
         </div>
 

@@ -415,8 +415,8 @@ function createLabelElement(label: StationLabel, options: LabelDisplayOptions): 
   if (isPicocell(label.azimuths)) {
     const pico = document.createElement("span");
     pico.className = "pico";
-    pico.textContent = "pico";
-    pico.title = "Picocell";
+    pico.textContent = "pico?";
+    pico.title = "Picocell?";
     summary.append(pico);
   }
 
@@ -503,7 +503,7 @@ function isAirfiberRequest(input: RequestInfo | URL): boolean {
 }
 
 function createMarkerKey(longitude: number, latitude: number): string {
-  return `${longitude.toFixed(5)},${latitude.toFixed(5)}`;
+  return `${longitude.toFixed(6)},${latitude.toFixed(6)}`;
 }
 
 function wrapConstructor(original: UnknownConstructor, onInstance: (instance: unknown, args: unknown[]) => void): UnknownConstructor {
