@@ -1,11 +1,14 @@
 import type { BandDetails } from "./airfiber.ts";
-import { asRecord } from "./utils.ts";
+import { isRecord } from "./utils.ts";
 
 export const CELL_RESPONSE_EVENT = "tmobile-bts-labels:cell-response";
 export const LABELS_UPDATE_EVENT = "tmobile-bts-labels:labels-update";
 
 export type BTSearchStatus = "found" | "missing" | "error" | "unconfigured";
 export type AzimuthMode = "per-band" | "overall";
+export type ThemeMode = "light" | "dark";
+
+export const DEFAULT_THEME_MODE: ThemeMode = "light";
 
 export interface LabelDisplayOptions {
   azimuthMode: AzimuthMode;
@@ -37,6 +40,7 @@ export interface StationLabel {
 export interface LabelsUpdatePayload {
   labels: StationLabel[];
   options: LabelDisplayOptions;
+  theme: ThemeMode;
 }
 
 export interface BTSearchStationIdLookupMessage {
@@ -58,16 +62,15 @@ export interface BTSearchLookupResponse {
 }
 
 export function isBTSearchLookupMessage(value: unknown): value is BTSearchLookupMessage {
-  const candidate = asRecord(value);
-  if (candidate === null) return false;
+  if (!isRecord(value)) return false;
 
-  if (candidate.type === "btsearch:lookup") return typeof candidate.stationId === "string" && /^\d+$/.test(candidate.stationId);
+  if (value.type === "btsearch:lookup") return typeof value.stationId === "string" && /^\d+$/.test(value.stationId);
 
   return (
-    candidate.type === "btsearch:lookup-gps" &&
-    typeof candidate.latitude === "number" &&
-    Number.isFinite(candidate.latitude) &&
-    typeof candidate.longitude === "number" &&
-    Number.isFinite(candidate.longitude)
+    value.type === "btsearch:lookup-gps" &&
+    typeof value.latitude === "number" &&
+    Number.isFinite(value.latitude) &&
+    typeof value.longitude === "number" &&
+    Number.isFinite(value.longitude)
   );
 }

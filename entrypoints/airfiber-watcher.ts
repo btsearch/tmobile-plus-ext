@@ -1,3 +1,4 @@
+import overlayStyles from "@/assets/airfiber-overlay.css?inline";
 import type { BandDetails } from "@/lib/airfiber.ts";
 import {
   createLabelsSignature,
@@ -12,12 +13,13 @@ import {
   type BTSearchStatus,
   CELL_RESPONSE_EVENT,
   DEFAULT_LABEL_DISPLAY_OPTIONS,
+  DEFAULT_THEME_MODE,
   LABELS_UPDATE_EVENT,
   type LabelDisplayOptions,
   type LabelsUpdatePayload,
   type StationLabel,
-} from "@/lib/messages";
-import { asRecord } from "@/lib/utils.ts";
+} from "@/lib/messages.ts";
+import { isRecord } from "@/lib/utils.ts";
 
 interface MapPoint {
   x: number;
@@ -33,6 +35,7 @@ interface MapProjection {
 }
 
 interface OverlayViewInstance {
+  draw?(): void;
   setMap(map: unknown): void;
   getPanes(): MapPanes | null;
   getProjection(): MapProjection;
@@ -62,121 +65,43 @@ interface MapBearingObject {
   setMap?: (map: unknown) => void;
 }
 
-const overlayStyles = `
-  :host {
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-variant-numeric: tabular-nums;
-    pointer-events: none;
-  }
+interface ThemedMap {
+  get?: (propertyName: string) => unknown;
+  setOptions?: (options: MapOptions) => void;
+}
 
-  .label {
-    --label-background: rgba(255, 255, 255, 0.97);
-    --label-border: #a1a1aa;
-    align-items: center;
-    background: var(--label-background);
-    border: 1px solid var(--label-border);
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(26, 18, 23, 0.14);
-    color: #241820;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    max-width: 320px;
-    min-width: 190px;
-    padding: 8px 10px;
-    position: absolute;
-    transform: translate(-50%, calc(-100% - 18px));
-    white-space: nowrap;
-  }
+interface MapOptions extends Record<string, unknown> {
+  styles?: unknown;
+}
 
-  .label.nr {
-    --label-background: rgba(255, 247, 253, 0.98);
-    --label-border: #b0008f;
-  }
+interface MapStyleRule {
+  featureType?: string;
+  elementType?: string;
+  stylers: Array<Record<string, string>>;
+}
 
-  .label.plus {
-    --label-background: rgba(245, 249, 255, 0.98);
-    --label-border: #3474b9;
-  }
-
-  .label::after {
-    background: inherit;
-    border-bottom: 1px solid var(--label-border);
-    border-right: 1px solid var(--label-border);
-    bottom: -4px;
-    content: "";
-    height: 7px;
-    left: calc(50% - 4px);
-    position: absolute;
-    transform: rotate(45deg);
-    width: 7px;
-  }
-
-  .summary {
-    align-items: center;
-    display: flex;
-    font-size: 13px;
-    font-weight: 750;
-    gap: 5px;
-    justify-content: flex-start;
-    line-height: 1.15;
-    width: 100%;
-  }
-
-  .band-row {
-    color: #5f4e59;
-    font-family: inherit;
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 1.25;
-    max-width: 300px;
-    white-space: nowrap;
-    width: 100%;
-  }
-
-  .coordinates {
-    border-top: 1px solid rgba(95, 78, 89, 0.18);
-    color: #806b77;
-    font-size: 9px;
-    font-weight: 600;
-    line-height: 1.2;
-    margin-top: 2px;
-    padding-top: 4px;
-    text-align: center;
-    width: 100%;
-  }
-
-  .overall-azimuths {
-    color: #806b77;
-    font-size: 10px;
-  }
-
-  .dss {
-    color: #e20074;
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    margin-left: auto;
-  }
-
-  .pico {
-    color: #806b77;
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-  }
-
-  .status {
-    border: 1px solid rgba(36, 24, 32, 0.22);
-    border-radius: 50%;
-    height: 6px;
-    width: 6px;
-  }
-
-  .status.found { background: #18a65b; }
-  .status.missing { background: #f39a18; }
-  .status.error { background: #d74242; }
-`;
+const DARK_MAP_STYLES: MapStyleRule[] = [
+  { elementType: "geometry", stylers: [{ color: "#000000" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#000000" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#bdbdbd" }] },
+  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#3a3a3a" }] },
+  { featureType: "administrative.country", elementType: "labels.text.fill", stylers: [{ color: "#e0e0e0" }] },
+  { featureType: "administrative.land_parcel", elementType: "geometry.stroke", stylers: [{ color: "#242424" }] },
+  { featureType: "landscape.man_made", elementType: "geometry.fill", stylers: [{ color: "#080808" }] },
+  { featureType: "poi", elementType: "geometry", stylers: [{ color: "#07100b" }] },
+  { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#9dac9e" }] },
+  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#07140c" }] },
+  { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#9bbba7" }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#171717" }] },
+  { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#cccccc" }] },
+  { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#242424" }] },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#333333" }] },
+  { featureType: "road.highway.controlled_access", elementType: "geometry", stylers: [{ color: "#3b2633" }] },
+  { featureType: "transit", elementType: "geometry", stylers: [{ color: "#111111" }] },
+  { featureType: "transit.station", elementType: "geometry", stylers: [{ color: "#111820" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#001523" }] },
+  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#8eb8cf" }] },
+];
 
 export default defineUnlistedScript(() => {
   const pageWindow = window as unknown as InstrumentedWindow;
@@ -190,7 +115,10 @@ export default defineUnlistedScript(() => {
   let currentMap: unknown;
   let labels: StationLabel[] = [];
   let displayOptions = DEFAULT_LABEL_DISPLAY_OPTIONS;
+  let theme = DEFAULT_THEME_MODE;
   let overlay: OverlayViewInstance | undefined;
+  let originalMapStyles: unknown;
+  let setCurrentMapOptions: ((options: MapOptions) => void) | undefined;
   const markers = new Map<string, Set<MapBearingObject>>();
   let mapConstructorPatched = false;
   let markerConstructorPatched = false;
@@ -203,6 +131,8 @@ export default defineUnlistedScript(() => {
 
     labels = payload.labels;
     displayOptions = payload.options;
+    theme = payload.theme;
+    applyMapTheme();
     renderOverlay();
   });
 
@@ -255,8 +185,8 @@ export default defineUnlistedScript(() => {
     if (!markerConstructorPatched && maps.Marker !== undefined) {
       maps.Marker = wrapConstructor(maps.Marker, (instance, args) => {
         const marker = instance as MapBearingObject;
-        const options = asRecord(args[0]);
-        captureMap(marker.getMap?.() ?? options?.map);
+        const options = args[0];
+        captureMap(marker.getMap?.() ?? (isRecord(options) ? options.map : undefined));
         trackMarker(marker);
       });
       markerConstructorPatched = true;
@@ -269,9 +199,32 @@ export default defineUnlistedScript(() => {
     if (map === undefined || map === null || map === currentMap) return;
 
     currentMap = map;
+    const themedMap = map as ThemedMap;
+    originalMapStyles = themedMap.get?.("styles");
+    const originalSetOptions = themedMap.setOptions?.bind(themedMap);
+    setCurrentMapOptions = originalSetOptions;
+
+    if (originalSetOptions !== undefined) {
+      themedMap.setOptions = (options) => {
+        if (!Object.prototype.hasOwnProperty.call(options, "styles")) {
+          originalSetOptions(options);
+          return;
+        }
+
+        originalMapStyles = options.styles;
+        originalSetOptions(theme === "dark" ? { ...options, styles: DARK_MAP_STYLES } : options);
+      };
+    }
+
     overlay?.setMap(null);
     overlay = undefined;
+    applyMapTheme();
     renderOverlay();
+  }
+
+  function applyMapTheme(): void {
+    const styles = theme === "dark" ? DARK_MAP_STYLES : originalMapStyles;
+    setCurrentMapOptions?.({ styles });
   }
 
   function renderOverlay(): void {
@@ -284,12 +237,16 @@ export default defineUnlistedScript(() => {
       overlay = createLabelsOverlay(maps.OverlayView, maps.LatLng, () => ({
         labels: labels.filter(hasVisibleMarker),
         options: displayOptions,
+        theme,
       }));
       overlay.setMap(currentMap);
     }
 
-    const drawable = overlay as OverlayViewInstance & { draw?: () => void };
-    drawable.draw?.();
+    overlay.draw?.();
+  }
+
+  function scheduleOverlayRender(): void {
+    window.queueMicrotask(renderOverlay);
   }
 
   function trackMarker(marker: MapBearingObject): void {
@@ -304,13 +261,16 @@ export default defineUnlistedScript(() => {
       marker.setMap = (map) => {
         originalSetMap(map);
         if (map === null) removeTrackedMarker(key, marker);
-        else addTrackedMarker(key, marker);
-        window.queueMicrotask(renderOverlay);
+        else {
+          captureMap(map);
+          addTrackedMarker(key, marker);
+        }
+        scheduleOverlayRender();
       };
     }
 
-    marker.addListener?.("visible_changed", () => window.queueMicrotask(renderOverlay));
-    window.queueMicrotask(renderOverlay);
+    marker.addListener?.("visible_changed", scheduleOverlayRender);
+    scheduleOverlayRender();
   }
 
   function addTrackedMarker(key: string, marker: MapBearingObject): void {
@@ -366,20 +326,23 @@ function createLabelsOverlay(
       this.getPanes()?.floatPane.append(host);
     }
 
-    draw(): void {
-      if (this.container === null) return;
+    override draw(): void {
+      const container = this.container;
+      if (container === null) return;
 
-      const { labels, options } = getPayload();
-      const signature = createLabelsSignature({ labels, options });
+      const { labels, options, theme } = getPayload();
+      if (this.host !== null) this.host.dataset.theme = theme;
+
+      const signature = createLabelsSignature({ labels, options, theme });
       if (signature !== this.renderedSignature) {
         this.renderedSignature = signature;
-        this.container.replaceChildren(...labels.map((label) => createLabelElement(label, options)));
+        container.replaceChildren(...labels.map((label) => createLabelElement(label, options)));
       }
 
       const projection = this.getProjection();
       labels.forEach((label, index) => {
         const point = projection.fromLatLngToDivPixel(new LatLng(label.latitude, label.longitude));
-        const element = this.container?.children.item(index);
+        const element = container.children.item(index);
         if (!(element instanceof HTMLElement)) return;
 
         if (point === null) {

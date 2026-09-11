@@ -1,4 +1,4 @@
-import { asRecord } from "./utils.ts";
+import { isRecord } from "./utils.ts";
 
 export interface BandDetails {
   band: string;
@@ -70,22 +70,24 @@ function readCellRecords(payload: unknown): Record<string, unknown>[] {
   if (!Array.isArray(payload)) return [];
 
   return payload.flatMap((batchItem) => {
-    const result = asRecord(asRecord(batchItem)?.result);
-    const data = asRecord(result?.data);
-    const json = data?.json;
-    if (!Array.isArray(json)) return [];
+    if (!isRecord(batchItem)) return [];
 
-    return json.flatMap((cell) => {
-      const record = asRecord(cell);
-      return record === null ? [] : [record];
-    });
+    const { result } = batchItem;
+    if (!isRecord(result)) return [];
+
+    const { data } = result;
+    if (!isRecord(data) || !Array.isArray(data.json)) return [];
+
+    return data.json.filter(isRecord);
   });
 }
 
 function readCoordinate(record: Record<string, unknown>): Coordinate | null {
-  const geographicLocation = asRecord(record.geographicLocation);
-  const geometry = Array.isArray(geographicLocation?.geometry) ? asRecord(geographicLocation.geometry[0]) : null;
-  if (geometry === null || typeof geometry.x !== "string" || typeof geometry.y !== "string") return null;
+  const { geographicLocation } = record;
+  if (!isRecord(geographicLocation) || !Array.isArray(geographicLocation.geometry)) return null;
+
+  const geometry = geographicLocation.geometry[0];
+  if (!isRecord(geometry) || typeof geometry.x !== "string" || typeof geometry.y !== "string") return null;
 
   const rawLongitude = geometry.x;
   const rawLatitude = geometry.y;
@@ -103,10 +105,7 @@ function readCoordinate(record: Record<string, unknown>): Coordinate | null {
 function readCharacteristics(record: Record<string, unknown>): Record<string, unknown>[] {
   if (!Array.isArray(record.characteristics)) return [];
 
-  return record.characteristics.flatMap((characteristic) => {
-    const object = asRecord(characteristic);
-    return object === null ? [] : [object];
-  });
+  return record.characteristics.filter(isRecord);
 }
 
 function readStationId(record: Record<string, unknown>): string | null {
@@ -114,16 +113,8 @@ function readStationId(record: Record<string, unknown>): string | null {
     const value = record[field];
     if (typeof value !== "string") continue;
 
-    if (!value.startsWith("ANT")) continue;
-
-    let stationId = "";
-    for (const character of value.slice(3)) {
-      if (character < "0" || character > "9") break;
-
-      stationId += character;
-    }
-
-    if (stationId.length > 0) return stationId;
+    const stationId = /^ANT(\d+)/.exec(value)?.[1];
+    if (stationId !== undefined) return stationId;
   }
 
   return null;

@@ -1,40 +1,40 @@
 import { type BTSearchLookupMessage, type BTSearchLookupResponse, isBTSearchLookupMessage } from "@/lib/messages.ts";
-import { btSearchApiKey } from "@/lib/settings";
-import { asRecord } from "@/lib/utils";
+import { btSearchApiKey } from "@/lib/settings.ts";
+import { isRecord } from "@/lib/utils.ts";
 
 const btSearchEndpoint = "https://btsearch.pl/api/v1/search?limit=100&sortBy=relevance";
 const tmobileMnc = 26002;
 
 export default defineBackground(() => {
-  const lookups = new Map<string, Promise<BTSearchLookupResponse>>();
-  let cacheApiKey: string | undefined;
-  let cacheRevision = 0;
+  const lookupCache = new Map<string, Promise<BTSearchLookupResponse>>();
+  let cachedApiKey: string | undefined;
+  let cacheGeneration = 0;
 
   browser.runtime.onMessage.addListener(async (message: unknown) => {
     if (!isBTSearchLookupMessage(message)) return undefined;
 
     const apiKey = (await btSearchApiKey.getValue()).trim();
-    if (apiKey !== cacheApiKey) {
-      lookups.clear();
-      cacheApiKey = apiKey;
-      cacheRevision += 1;
+    if (apiKey !== cachedApiKey) {
+      lookupCache.clear();
+      cachedApiKey = apiKey;
+      cacheGeneration += 1;
     }
 
     const lookupKey = message.type === "btsearch:lookup" ? `id:${message.stationId}` : `gps:${message.latitude},${message.longitude}`;
-    const cacheKey = `${cacheRevision}:${lookupKey}`;
-    const existing = lookups.get(cacheKey);
+    const cacheKey = `${cacheGeneration}:${lookupKey}`;
+    const existing = lookupCache.get(cacheKey);
     if (existing !== undefined) return existing;
 
     const lookup = lookupStation(message, apiKey)
       .then((result) => {
-        if (result.status === "error") lookups.delete(cacheKey);
+        if (result.status === "error") lookupCache.delete(cacheKey);
         return result;
       })
       .catch(() => {
-        lookups.delete(cacheKey);
+        lookupCache.delete(cacheKey);
         return { status: "error" as const, stationId: null };
       });
-    lookups.set(cacheKey, lookup);
+    lookupCache.set(cacheKey, lookup);
     return lookup;
   });
 });
@@ -87,16 +87,15 @@ function findMatchingStationId(payload: unknown, message: BTSearchLookupMessage)
       continue;
     }
 
-    const object = asRecord(current);
-    if (object === null) continue;
+    if (!isRecord(current)) continue;
 
-    const operator = asRecord(object.operator);
-    const location = asRecord(object.location);
-    const stationId = object.station_id;
+    const operator = isRecord(current.operator) ? current.operator : null;
+    const location = isRecord(current.location) ? current.location : null;
+    const stationId = current.station_id;
 
     if (typeof stationId === "string" && operator?.mnc === tmobileMnc && matchesLookup(message, stationId, location)) return stationId;
 
-    pending.push(...Object.values(object));
+    pending.push(...Object.values(current));
   }
 
   return null;

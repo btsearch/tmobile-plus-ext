@@ -9,7 +9,15 @@ import {
   isLabelsUpdatePayload,
   isPicocell,
 } from "../lib/label-display.ts";
-import { DEFAULT_LABEL_DISPLAY_OPTIONS, type LabelsUpdatePayload } from "../lib/messages.ts";
+import { DEFAULT_LABEL_DISPLAY_OPTIONS, DEFAULT_THEME_MODE, type LabelsUpdatePayload } from "../lib/messages.ts";
+import { isRecord } from "../lib/utils.ts";
+
+void test("recognizes non-null objects as records", () => {
+  assert.equal(isRecord({}), true);
+  assert.equal(isRecord([]), true);
+  assert.equal(isRecord(null), false);
+  assert.equal(isRecord("value"), false);
+});
 
 void test("formats per-band and overall azimuth modes", () => {
   const band = { band: "800", azimuths: [20, 130] };
@@ -46,15 +54,23 @@ void test("changes the render signature when only display options change", () =>
   assert.notEqual(createLabelsSignature(payload), createLabelsSignature(withoutCoordinates));
 });
 
+void test("keeps the render signature when only the theme changes", () => {
+  const payload = createPayload();
+
+  assert.equal(createLabelsSignature(payload), createLabelsSignature({ ...payload, theme: "dark" }));
+});
+
 void test("validates the complete labels update payload and status union", () => {
   const payload = createPayload();
   const invalidPayload = {
     ...payload,
     labels: [{ ...payload.labels[0], btSearchStatus: "unexpected" }],
   };
+  const invalidTheme = { ...payload, theme: "sepia" };
 
   assert.equal(isLabelsUpdatePayload(payload), true);
   assert.equal(isLabelsUpdatePayload(invalidPayload), false);
+  assert.equal(isLabelsUpdatePayload(invalidTheme), false);
 });
 
 function createPayload(): LabelsUpdatePayload {
@@ -73,6 +89,7 @@ function createPayload(): LabelsUpdatePayload {
         btSearchStatus: "found",
       },
     ],
-    options: { ...DEFAULT_LABEL_DISPLAY_OPTIONS },
+    options: DEFAULT_LABEL_DISPLAY_OPTIONS,
+    theme: DEFAULT_THEME_MODE,
   };
 }

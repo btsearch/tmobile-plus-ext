@@ -2,12 +2,36 @@
 @import "tailwindcss";
 
 :root {
-  color: #04080b;
-  background: #fafcfd;
+  --popup-canvas: #fafcfd;
+  --popup-subtle: #f2f5f6;
+  --popup-input: #ffffff;
+  --popup-border: #d7dddf;
+  --popup-text: #04080b;
+  --popup-muted: #596164;
+  --popup-placeholder: #737b7f;
+  --popup-switch-off: #cbd2d5;
+  --popup-switch-thumb: #ffffff;
+  --popup-danger: #b42318;
+
+  color: var(--popup-text);
   font-family: "Nunito Sans Variable", "Nunito Sans", sans-serif;
   color-scheme: light;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+}
+
+:root[data-theme="dark"] {
+  --popup-canvas: #000000;
+  --popup-subtle: #0d0d0d;
+  --popup-input: #080808;
+  --popup-border: #363636;
+  --popup-text: #f5f5f5;
+  --popup-muted: #bdbdbd;
+  --popup-placeholder: #8f8f8f;
+  --popup-switch-off: #555555;
+  --popup-danger: #ff948c;
+
+  color-scheme: dark;
 }
 
 html,
@@ -15,10 +39,16 @@ body,
 #root {
   min-width: 320px;
   margin: 0;
-  background: #fafcfd;
+  background: var(--popup-canvas);
 }
 
-button,
-input {
-  font: inherit;
+body {
+  transition:
+    color 160ms ease,
+    background-color 160ms ease;
+}
+
+::selection {
+  color: #ffffff;
+  background: #b0005a;
 }

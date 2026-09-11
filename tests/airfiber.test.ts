@@ -104,6 +104,12 @@ void test("extracts a station id before a multi-letter antenna suffix", () => {
   assert.equal(parseAirfiberStations(payload)[0]?.stationId, "50210");
 });
 
+void test("ignores malformed AirFiber records", () => {
+  const payload = [null, "invalid", { result: null }, { result: { data: { json: [null, "invalid", []] } } }];
+
+  assert.deepEqual(parseAirfiberStations(payload), []);
+});
+
 function createCell(id: string, x: string, y: string, azimuth: string, bands: { lte: string[]; nr: string[] }, isDSSEnabled = false) {
   return {
     id,

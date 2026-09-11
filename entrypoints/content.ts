@@ -1,15 +1,17 @@
+import "@/assets/content-theme.css";
 import { parseAirfiberStations } from "@/lib/airfiber.ts";
 import {
   type BTSearchLookupMessage,
   type BTSearchLookupResponse,
   CELL_RESPONSE_EVENT,
   DEFAULT_LABEL_DISPLAY_OPTIONS,
+  DEFAULT_THEME_MODE,
   LABELS_UPDATE_EVENT,
-  type LabelDisplayOptions,
   type LabelsUpdatePayload,
   type StationLabel,
+  type ThemeMode,
 } from "@/lib/messages.ts";
-import { btSearchApiKey, extensionEnabled, labelDisplayOptions } from "@/lib/settings.ts";
+import { btSearchApiKey, extensionEnabled, labelDisplayOptions, themeMode } from "@/lib/settings.ts";
 
 export default defineContentScript({
   matches: ["https://www.t-mobile.pl/mapa-nadajnikow*"],
@@ -20,37 +22,57 @@ export default defineContentScript({
     let latestLabels: StationLabel[] = [];
     let labelsEnabled = true;
     let displayOptions = DEFAULT_LABEL_DISPLAY_OPTIONS;
+    let theme = DEFAULT_THEME_MODE;
     let responseSequence = 0;
 
-    const dispatchCurrentLabels = () => {
-      dispatchLabels(bridgeElement, labelsEnabled ? latestLabels : [], displayOptions);
-    };
+    function dispatchCurrentLabels(): void {
+      const payload: LabelsUpdatePayload = {
+        labels: labelsEnabled ? latestLabels : [],
+        options: displayOptions,
+        theme,
+      };
+      bridgeElement?.dispatchEvent(
+        new CustomEvent(LABELS_UPDATE_EVENT, {
+          detail: JSON.stringify(payload),
+        }),
+      );
+    }
 
-    const publishLabels = (labels: StationLabel[]) => {
+    function updateTheme(nextTheme: ThemeMode): void {
+      theme = nextTheme;
+      document.documentElement.dataset.tmobilePlusTheme = nextTheme;
+    }
+
+    function publishLabels(labels: StationLabel[]): void {
       latestLabels = labels;
       dispatchCurrentLabels();
-    };
+    }
 
-    const processPayload = async (payload: unknown) => {
-      const sequence = ++responseSequence;
-      const stations = parseAirfiberStations(payload);
-      const initialLabels: StationLabel[] = stations.map((station) => ({
+    function processPayload(payload: unknown): Promise<void> {
+      const uncheckedLabels: StationLabel[] = parseAirfiberStations(payload).map((station) => ({
         ...station,
         btSearchStatus: "unchecked",
       }));
+      return refreshLabels(uncheckedLabels);
+    }
 
-      publishLabels(initialLabels);
+    async function refreshLabels(uncheckedLabels: StationLabel[]): Promise<void> {
+      const sequence = ++responseSequence;
+      publishLabels(uncheckedLabels);
 
-      const enrichedLabels = await Promise.all(initialLabels.map(enrichWithBTSearch));
+      const enrichedLabels = await Promise.all(uncheckedLabels.map(enrichWithBTSearch));
       if (sequence !== responseSequence) return;
 
       publishLabels(enrichedLabels);
-    };
+    }
 
-    const settingsLoaded = Promise.all([extensionEnabled.getValue(), labelDisplayOptions.getValue()]).then(([enabled, options]) => {
-      labelsEnabled = enabled;
-      displayOptions = options;
-    });
+    const settingsLoaded = Promise.all([extensionEnabled.getValue(), labelDisplayOptions.getValue(), themeMode.getValue()]).then(
+      ([enabled, options, storedTheme]) => {
+        labelsEnabled = enabled;
+        displayOptions = options;
+        updateTheme(storedTheme);
+      },
+    );
 
     await Promise.all([
       injectScript("/airfiber-watcher.js", {
@@ -87,19 +109,17 @@ export default defineContentScript({
       dispatchCurrentLabels();
     });
 
+    themeMode.watch((nextTheme) => {
+      updateTheme(nextTheme);
+      dispatchCurrentLabels();
+    });
+
     btSearchApiKey.watch(() => {
-      const sequence = ++responseSequence;
       const uncheckedLabels = latestLabels.map((label) => ({
         ...label,
         btSearchStatus: "unchecked" as const,
       }));
-      publishLabels(uncheckedLabels);
-
-      void Promise.all(uncheckedLabels.map(enrichWithBTSearch)).then((enrichedLabels) => {
-        if (sequence !== responseSequence) return;
-
-        publishLabels(enrichedLabels);
-      });
+      void refreshLabels(uncheckedLabels);
     });
   },
 });
@@ -127,13 +147,4 @@ async function enrichWithBTSearch(label: StationLabel): Promise<StationLabel> {
   } catch {
     return { ...label, btSearchStatus: "error" };
   }
-}
-
-function dispatchLabels(bridgeElement: HTMLScriptElement | undefined, labels: StationLabel[], options: LabelDisplayOptions): void {
-  const payload: LabelsUpdatePayload = { labels, options };
-  bridgeElement?.dispatchEvent(
-    new CustomEvent(LABELS_UPDATE_EVENT, {
-      detail: JSON.stringify(payload),
-    }),
-  );
 }

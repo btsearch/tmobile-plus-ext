@@ -1,0 +1,200 @@
+html[data-tmobile-plus-theme="dark"] body {
+  --tmobile-dark-canvas: #000000;
+  --tmobile-dark-surface: #080808;
+  --tmobile-dark-surface-hover: #161616;
+  --tmobile-dark-border: #3a3a3a;
+  --tmobile-dark-text: #f5f5f5;
+  --tmobile-dark-muted: #bdbdbd;
+  --tmobile-dark-blue-surface: #071b2d;
+  --tmobile-dark-blue-text: #d9ebff;
+  --tmobile-dark-hero: #1d0714;
+
+  color: var(--tmobile-dark-text);
+  background: var(--tmobile-dark-canvas);
+  accent-color: #e20074;
+  color-scheme: dark;
+  scrollbar-color: #4a4a4a var(--tmobile-dark-canvas);
+}
+
+html[data-tmobile-plus-theme="dark"] body #__next,
+html[data-tmobile-plus-theme="dark"] body main {
+  color: var(--tmobile-dark-text);
+  background-color: var(--tmobile-dark-canvas);
+}
+
+html[data-tmobile-plus-theme="dark"] body #__next > [class~="bg-base-gray-100"],
+html[data-tmobile-plus-theme="dark"] body #__next > div > [class~="bg-base-gray-100"],
+html[data-tmobile-plus-theme="dark"] body #__next > [class~="text-base-gray-900"] {
+  color: var(--tmobile-dark-text) !important;
+  background-color: var(--tmobile-dark-canvas) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body ::selection {
+  color: #ffffff;
+  background: #b0005a;
+}
+
+html[data-tmobile-plus-theme="dark"] body header .sticky-header,
+html[data-tmobile-plus-theme="dark"] body header [class~="bg-base-gray-50"],
+html[data-tmobile-plus-theme="dark"] body header .menu-dropdown-submenu,
+html[data-tmobile-plus-theme="dark"] body main [class~="bg-base-gray-50"] {
+  color: var(--tmobile-dark-text);
+  background-color: var(--tmobile-dark-surface) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body header a,
+html[data-tmobile-plus-theme="dark"] body header button {
+  color: var(--tmobile-dark-text) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body header :is([data-ma="menu-basket"], .menu-btn-account, [title="Migam"]) svg,
+html[data-tmobile-plus-theme="dark"] body header :is([data-ma="menu-basket"], .menu-btn-account, [title="Migam"]) svg path {
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body main [class~="bg-base-gray-100"],
+html[data-tmobile-plus-theme="dark"] body main [class~="bg-base-gray-200"] {
+  color: var(--tmobile-dark-text);
+  background-color: var(--tmobile-dark-surface-hover) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body main [class~="bg-[#F9E0F6]"] {
+  color: var(--tmobile-dark-text);
+  background-color: var(--tmobile-dark-hero) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body main [class~="bg-base-secondary-200"] {
+  color: var(--tmobile-dark-blue-text);
+  background-color: var(--tmobile-dark-blue-surface) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body header [class~="text-base-gray-900"],
+html[data-tmobile-plus-theme="dark"] body header [class~="text-base-gray-800"],
+html[data-tmobile-plus-theme="dark"] body header [class~="text-[#262626]"],
+html[data-tmobile-plus-theme="dark"] body main [class~="text-base-gray-900"],
+html[data-tmobile-plus-theme="dark"] body main [class~="text-base-gray-800"],
+html[data-tmobile-plus-theme="dark"] body main [class~="text-base-gray-700"] {
+  color: var(--tmobile-dark-text) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body header [class~="text-base-gray-600"],
+html[data-tmobile-plus-theme="dark"] body main [class~="text-base-gray-600"],
+html[data-tmobile-plus-theme="dark"] body main [class~="text-base-gray-500"],
+html[data-tmobile-plus-theme="dark"] body main [class~="text-base-gray-400"] {
+  color: var(--tmobile-dark-muted) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body header [class~="border-base-gray-200"],
+html[data-tmobile-plus-theme="dark"] body header [class~="border-base-gray-300"],
+html[data-tmobile-plus-theme="dark"] body main [class~="border-base-gray-200"],
+html[data-tmobile-plus-theme="dark"] body main [class~="border-base-gray-300"],
+html[data-tmobile-plus-theme="dark"] body main [class~="border-base-gray-400"] {
+  border-color: var(--tmobile-dark-border) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body main input[role="combobox"] {
+  color: var(--tmobile-dark-text) !important;
+  caret-color: #e20074;
+  background-color: var(--tmobile-dark-surface) !important;
+  background-image: none !important;
+  border-color: var(--tmobile-dark-border) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body main input[role="combobox"]::placeholder {
+  color: var(--tmobile-dark-muted) !important;
+  opacity: 1;
+}
+
+html[data-tmobile-plus-theme="dark"] body main input[role="combobox"] + [role="listbox"],
+html[data-tmobile-plus-theme="dark"] body main [role="listbox"][data-open] {
+  color: var(--tmobile-dark-text) !important;
+  background: var(--tmobile-dark-surface) !important;
+  border-color: var(--tmobile-dark-border) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.72) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body main [role="listbox"] [role="option"] {
+  color: var(--tmobile-dark-text) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body main [role="listbox"] [role="option"][data-active],
+html[data-tmobile-plus-theme="dark"] body main [role="listbox"] [role="option"][data-focus] {
+  background: var(--tmobile-dark-surface-hover) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body main button[class~="bg-base-gray-50"]:not(:disabled):hover,
+html[data-tmobile-plus-theme="dark"] body main a[class~="bg-base-gray-50"]:hover {
+  background-color: var(--tmobile-dark-surface-hover) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body main :focus-visible {
+  outline-color: #f13b99;
+}
+
+html[data-tmobile-plus-theme="dark"] body main [role="region"][aria-label="Mapa"] {
+  background: var(--tmobile-dark-canvas);
+  border-color: var(--tmobile-dark-border);
+}
+
+html[data-tmobile-plus-theme="dark"] body main [role="region"][aria-label="Mapa"] .gm-style-mtc button,
+html[data-tmobile-plus-theme="dark"] body main [role="region"][aria-label="Mapa"] .gm-control-active,
+html[data-tmobile-plus-theme="dark"] body main [role="region"][aria-label="Mapa"] .gm-svpc,
+html[data-tmobile-plus-theme="dark"] body main [role="region"][aria-label="Mapa"] .gm-bundled-control .gmnoprint > div {
+  color: var(--tmobile-dark-text) !important;
+  background: var(--tmobile-dark-surface) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body main [role="region"][aria-label="Mapa"] .gm-control-active img,
+html[data-tmobile-plus-theme="dark"] body main [role="region"][aria-label="Mapa"] .gm-svpc img {
+  filter: invert(1) brightness(1.4);
+}
+
+html[data-tmobile-plus-theme="dark"] body main [role="region"][aria-label="Mapa"] .gm-style-cc > div {
+  background-color: rgba(0, 0, 0, 0.88) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body main [role="region"][aria-label="Mapa"] .gm-style-cc a,
+html[data-tmobile-plus-theme="dark"] body main [role="region"][aria-label="Mapa"] .gm-style-cc span {
+  color: #d7dbea !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body .pac-container {
+  color: var(--tmobile-dark-text);
+  background: var(--tmobile-dark-surface);
+  border-color: var(--tmobile-dark-border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+}
+
+html[data-tmobile-plus-theme="dark"] body .pac-item {
+  color: var(--tmobile-dark-muted);
+  border-color: var(--tmobile-dark-border);
+}
+
+html[data-tmobile-plus-theme="dark"] body .pac-item:hover,
+html[data-tmobile-plus-theme="dark"] body .pac-item-selected {
+  background: var(--tmobile-dark-surface-hover);
+}
+
+html[data-tmobile-plus-theme="dark"] body .pac-item-query {
+  color: var(--tmobile-dark-text);
+}
+
+html[data-tmobile-plus-theme="dark"] body #didomi-host .didomi-popup-container {
+  color: var(--tmobile-dark-text) !important;
+  background: var(--tmobile-dark-surface) !important;
+  border-color: var(--tmobile-dark-border) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.42) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body #didomi-host .didomi-popup-container p,
+html[data-tmobile-plus-theme="dark"] body #didomi-host .didomi-popup-container span,
+html[data-tmobile-plus-theme="dark"] body #didomi-host .didomi-popup-container a:not([class*="button"]) {
+  color: var(--tmobile-dark-text) !important;
+}
+
+html[data-tmobile-plus-theme="dark"] body #snrs_chat-bubble {
+  color: var(--tmobile-dark-text) !important;
+  background: var(--tmobile-dark-surface) !important;
+  border-color: var(--tmobile-dark-border) !important;
+}
