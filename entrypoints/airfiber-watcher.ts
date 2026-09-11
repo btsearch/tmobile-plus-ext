@@ -387,7 +387,7 @@ function createLabelElement(label: StationLabel, options: LabelDisplayOptions): 
     const dss = document.createElement("span");
     dss.className = "dss";
     dss.textContent = "DSS";
-    dss.title = "Stacja posiada sygnalizację 5G";
+    dss.title = "Stacja posiada pasmo 2100MHz";
     summary.append(dss);
   }
 
